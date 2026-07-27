@@ -1,0 +1,10 @@
+{
+  "data": [
+    {
+      "wav": "test_money.wav",
+      "transcription": "I didn't say you stole the money.",
+      "pitch": "data/dataset/metadata/ljspeech/phoneme_level/pitch/LJSpeech-pitch-LJ001-0001.npy",
+      "energy": "data/dataset/metadata/ljspeech/phoneme_level/energy/LJSpeech-energy-LJ001-0001.npy"
+    }
+  ]
+}

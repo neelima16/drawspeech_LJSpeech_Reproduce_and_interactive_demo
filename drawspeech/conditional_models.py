@@ -10,6 +10,7 @@ from drawspeech.modules.contour_predictor.model import Sketch2ContourPredictor
 
 from drawspeech.utilities.tools import wav_mask_to_latent_mask, modify_curve_length, min_max_normalize, wav_mask_to_latent_mask, sketch_extractor, make_decision
 from drawspeech.utilities.diffusion_util import conv_nd
+import numpy as np
 
 
 """
@@ -250,7 +251,7 @@ class TextEncoderwithVarianceAdaptor(nn.Module):
         if self.training:
             _mel_mask = ~mel_mask.bool()
         elif self.infer:
-            _mel_mask = None
+            _mel_mask = torch.zeros_like(mel_mask).bool()
             pitch = pitch if isinstance(pitch, torch.Tensor) else None
             pitch_sketch = pitch_sketch if isinstance(pitch_sketch, torch.Tensor) else None
             pitch_length = pitch_length if isinstance(pitch_length, torch.Tensor) else None
@@ -262,7 +263,7 @@ class TextEncoderwithVarianceAdaptor(nn.Module):
             print(f"Given pitch: {pitch is not None} | " + f"Given energy: {energy is not None} | " + f"Given phoneme_duration: {phoneme_duration is not None}")
         else:
             # under validation
-            _mel_mask = None
+            _mel_mask = torch.zeros_like(mel_mask).bool()
             pitch = None
             pitch_sketch = None
             pitch_length = None
@@ -282,6 +283,11 @@ class TextEncoderwithVarianceAdaptor(nn.Module):
             curve_mask = src_mask
 
         if self.sketch_to_contour_predictor:
+            # print("\n========== Predictor Status ==========")
+            # print("predictor object:", self.sketch_to_contour_predictor)
+            # print("training:", self.training)
+            # print("infer:", self.infer)
+            # print("=====================================\n")
             if self.training:
                 # we do not provide the sketches during training with a certain probability
                 if make_decision(self.prob_drop_pitch):
@@ -292,6 +298,40 @@ class TextEncoderwithVarianceAdaptor(nn.Module):
                 pitch_sketch = modify_curve_length(pitch_sketch, pitch_length, curve_mask, pad_is_1=False)
                 energy_sketch = modify_curve_length(energy_sketch, energy_length, curve_mask, pad_is_1=False)
             detailed_pitch, detailed_energy = self.sketch_to_contour_predictor(expanded_text_emb, pitch_sketch, energy_sketch, curve_mask)
+            # print("text_emb:", text_emb.shape)
+            # print("expanded_text_emb:", expanded_text_emb.shape)
+            # print("curve_mask:", curve_mask.shape)
+            # print("feature_level:", self.feature_level)
+            if not self.training and detailed_pitch is not None:
+                np.save("predicted_pitch.npy",
+                        detailed_pitch[0].detach().cpu().numpy())
+
+            if not self.training and pitch_sketch is not None:
+                np.save("input_pitch.npy",
+                        pitch_sketch[0].detach().cpu().numpy())
+            if not self.training:
+                # print("\n========== Contour Predictor ==========")
+
+                # if pitch_sketch is not None:
+                #     print("Input sketch:")
+                #     print(pitch_sketch[0, :20].detach().cpu().numpy())
+
+                if detailed_pitch is not None:
+                    # print("Predicted contour:")
+                    # print(detailed_pitch[0, :20].detach().cpu().numpy())
+                    # print("min/max:",
+                    #     detailed_pitch.min().item(),
+                    #     detailed_pitch.max().item())
+                    mask = curve_mask[0].detach().cpu().numpy().astype(bool)
+
+                    pred_full = detailed_pitch[0].detach().cpu().numpy()
+                    pred_valid = pred_full[mask]
+
+                    np.save("predicted_contour_full.npy", pred_full)
+                    np.save("predicted_contour.npy", pred_valid)
+                    # print("Predicted contour shape:", pred.shape)
+
+                # print("=======================================\n")
         else:
             detailed_pitch, detailed_energy = None, None
         
@@ -301,11 +341,26 @@ class TextEncoderwithVarianceAdaptor(nn.Module):
             pitch = modify_curve_length(pitch, pitch_length, curve_mask, pad_is_1=False)
             energy = modify_curve_length(energy, energy_length, curve_mask, pad_is_1=False)
             pitch = pitch if pitch is not None else detailed_pitch
+            # pitch = pitch_sketch
             energy = energy if energy is not None else detailed_energy
 
+        if not self.training:
+                    np.save(
+                        "synthesized_pitch.npy",
+                        pitch[0].detach().cpu().numpy()
+                    )
+                    
         output, p_predictions, e_predictions, log_d_predictions, d_rounded, mel_lens, _mel_mask = self.variance_adaptor(text_emb, _src_mask, _mel_mask, max_mel_len, pitch, energy, phoneme_duration)
+        # if not self.training:
+            # print("\n========== MEL LENGTH ==========")
+            # print("mel_lens:", mel_lens)
+            # print("duration_rounded:", d_rounded.sum(dim=1))
+            # print("================================\n")
+                
         mel_mask = ~_mel_mask.bool()
+
         
+                
         if self.training:
             targets = [pitch, energy, phoneme_duration]
             predictions = [p_predictions, e_predictions, log_d_predictions]

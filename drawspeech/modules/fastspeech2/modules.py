@@ -82,16 +82,33 @@ class VarianceAdaptor(nn.Module):
         self.energy_embedding = nn.Embedding(
             n_bins, energy_embedding_dim
         )
-
     def get_pitch_embedding(self, x, target, mask, control):
+
         prediction = self.pitch_predictor(x, mask)
+
         if target is not None:
-            embedding = self.pitch_embedding(torch.bucketize(target, self.pitch_bins))
+
+            # print("\n========== VarianceAdaptor ==========")
+            # print("Pitch target (first 20):")
+            # print(target[0, :20].detach().cpu().numpy())
+
+            bucket = torch.bucketize(target, self.pitch_bins)
+
+            # print("Bucket IDs:")
+            # print(bucket[0, :20].detach().cpu().numpy())
+
+            embedding = self.pitch_embedding(bucket)
+
+            # print("Embedding norm:")
+            # print(torch.norm(embedding, dim=-1)[0, :20].detach().cpu().numpy())
+            # print("=====================================\n")
+
         else:
             prediction = prediction * control
             embedding = self.pitch_embedding(
                 torch.bucketize(prediction, self.pitch_bins)
             )
+
         return prediction, embedding
 
     def get_energy_embedding(self, x, target, mask, control):

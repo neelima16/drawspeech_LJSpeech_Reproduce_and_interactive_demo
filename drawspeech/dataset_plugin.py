@@ -120,4 +120,3 @@ def get_preprocessed_meta(config, dl_output, metadata):
         "energy_length": energy_length,
         "phoneme_duration": duration,
     }
-

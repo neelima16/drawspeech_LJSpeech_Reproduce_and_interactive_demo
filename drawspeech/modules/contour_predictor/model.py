@@ -21,9 +21,49 @@ class Sketch2ContourPredictor(nn.Module):
         self.linear_layer = nn.Linear(embedding_dim, 2)
 
     def get_pitch_embedding(self, x, mask):
+
         if mask is not None:
             x = x.masked_fill(mask == 0, 0.0)
-        embedding = self.pitch_embedding(torch.bucketize(x, self.pitch_bins))
+
+        # -------------------------
+        # Bucketization
+        # -------------------------
+        bucket = torch.bucketize(x, self.pitch_bins)
+
+        # print("\n========== Pitch Bucket IDs ==========")
+        # print("First 20 buckets:")
+        # print(bucket[0, :20].detach().cpu().numpy())
+
+        unique = torch.unique(bucket)
+
+        # print("Unique buckets:")
+        # print(unique.detach().cpu().numpy())
+
+        # print("Number of unique buckets:", len(unique))
+
+        # -------------------------
+        # Embedding lookup
+        # -------------------------
+        embedding = self.pitch_embedding(bucket)
+        
+        # print("Embedding vector (first phoneme, first 10 dims):")
+        # print(
+        #     embedding[0, 0, :10]
+        #     .detach()
+        #     .cpu()
+        #     .numpy()
+        # )   
+
+        # print("Embedding norm:")
+        # print(
+        #     torch.norm(
+        #         embedding,
+        #         dim=-1
+        #     )[0, :20].detach().cpu().numpy()
+        # )
+
+        # print("======================================\n")
+
         return embedding
 
     def get_energy_embedding(self, x, mask):

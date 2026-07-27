@@ -2,7 +2,6 @@ from multiprocessing.sharedctypes import Value
 import statistics
 import sys
 import os
-from tkinter import E
 
 import torch
 import torch.nn as nn
@@ -1131,9 +1130,10 @@ class LatentDiffusion(DDPM):
                 if cond_model_key in cond_dict.keys():
                     continue
 
-                if not self.training:
-                    if isinstance(self.cond_stage_models[self.cond_stage_model_metadata[cond_model_key]["model_idx"]], CLAPAudioEmbeddingClassifierFreev2):
-                        print("Warning: CLAP model normally should use text for evaluation")
+                # PATCH: CLAP class absent in DrawSpeech; check removed
+                # if not self.training:
+                #     if isinstance(self.cond_stage_models[self.cond_stage_model_metadata[cond_model_key]["model_idx"]], CLAPAudioEmbeddingClassifierFreev2):
+                #         print("Warning: CLAP model normally should use text for evaluation")
 
                 # The original data for conditioning
                 # If cond_model_key is "all", that means the conditional model need all the information from a batch
@@ -1193,9 +1193,23 @@ class LatentDiffusion(DDPM):
         return out
 
     def decode_first_stage(self, z):
+
         with torch.no_grad():
+
+            # print("\n========== LATENT ==========")
+            # print("latent shape:", z.shape)
+            # print("latent min/max:", z.min().item(), z.max().item())
+
             z = 1.0 / self.scale_factor * z
+
             decoding = self.first_stage_model.decode(z)
+
+            # print("\n========== DECODED MEL ==========")
+            # print("decoded mel shape:", decoding.shape)
+            # print("decoded mel min/max:",
+            #     decoding.min().item(),
+            #     decoding.max().item())
+
         return decoding
 
     def mel_spectrogram_to_waveform(
@@ -1205,8 +1219,16 @@ class LatentDiffusion(DDPM):
         if len(mel.size()) == 4:
             mel = mel.squeeze(1)
         mel = mel.permute(0, 2, 1)
+        # print("\n========== VOCODER ==========")
+        # print("Mel input:", mel.shape)
+
         waveform = self.first_stage_model.vocoder(mel)
+
+        # print("Waveform:", waveform.shape)
+        # print("=============================\n")
         waveform = waveform.cpu().detach().numpy()
+        # print("Waveform after cpu().detach().numpy() :", waveform.shape)
+        # print("=============================\n")
         if save:
             self.save_waveform(waveform, savepath, name)
         return waveform

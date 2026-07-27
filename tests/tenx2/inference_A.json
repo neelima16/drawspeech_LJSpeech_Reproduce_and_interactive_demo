@@ -1,0 +1,104 @@
+{
+  "data": [
+    {
+      "wav": "wavs/LJ011-0084.wav",
+      "transcription": "After three years' confinement in the latter prison he passed himself off as his brother, Colonel Montgomery,",
+      "phonemes": "{AE1 F T ER0 TH R IY1 Y IH1 R Z K AH0 N F AY1 N M AH0 N T IH0 N DH AH0 L AE1 T ER0 P R IH1 Z AH0 N sp HH IY1 P AE1 S T HH IH0 M S EH1 L F AO1 F AE1 Z HH IH1 Z B R AH1 DH ER0 sp K ER1 N AH0 L M AA0 N T G AH1 M R IY0 sp}",
+      "pitch_sketch": "tests/tenx2/sketches/LJ011-0084_A.npy",
+      "energy_sketch": "data/dataset/metadata/ljspeech/phoneme_level/energy/LJSpeech-energy-LJ011-0084.npy",
+      "pitch": "",
+      "energy": "",
+      "duration": "data/dataset/metadata/ljspeech/phoneme_level/duration/LJSpeech-duration-LJ011-0084.npy"
+    },
+    {
+      "wav": "wavs/LJ044-0178.wav",
+      "transcription": "he stated his desire that he should be accepted as a friend of the Cuban Revolution.",
+      "phonemes": "{HH IY1 S T EY1 T AH0 D HH IH1 Z D IH0 Z AY1 ER0 DH AH0 T HH IY1 SH UH1 D B IY1 AE0 K S EH1 P T IH0 D AE1 Z EY1 F R EH1 N D AH0 V DH IY0 K Y UW1 B AH0 N R EH2 V AH0 L UW1 SH AH0 N sp}",
+      "pitch_sketch": "tests/tenx2/sketches/LJ044-0178_A.npy",
+      "energy_sketch": "data/dataset/metadata/ljspeech/phoneme_level/energy/LJSpeech-energy-LJ044-0178.npy",
+      "pitch": "",
+      "energy": "",
+      "duration": "data/dataset/metadata/ljspeech/phoneme_level/duration/LJSpeech-duration-LJ044-0178.npy"
+    },
+    {
+      "wav": "wavs/LJ044-0196.wav",
+      "transcription": "to a country in which he must have thought were embodied the political principles to which he had been committed for so long.",
+      "phonemes": "{T UW1 AH0 K AH1 N T R IY0 IH1 N W IH1 CH HH IY1 M AH1 S T HH AE1 V TH AO1 T sp W ER1 IH0 M B AA1 D IY0 D DH AH1 P AH0 L IH1 T AH0 K AH0 L P R IH1 N S AH0 P AH0 L Z T AH0 W IH1 CH HH IY1 HH AE1 D B IH1 N K AH0 M IH1 T AH0 D F AO1 R S OW1 L AO1 NG}",
+      "pitch_sketch": "tests/tenx2/sketches/LJ044-0196_A.npy",
+      "energy_sketch": "data/dataset/metadata/ljspeech/phoneme_level/energy/LJSpeech-energy-LJ044-0196.npy",
+      "pitch": "",
+      "energy": "",
+      "duration": "data/dataset/metadata/ljspeech/phoneme_level/duration/LJSpeech-duration-LJ044-0196.npy"
+    },
+    {
+      "wav": "wavs/LJ042-0043.wav",
+      "transcription": "Ask me and I will tell you I fight for communism.",
+      "phonemes": "{sil AE1 S K M IY1 AE1 N D AY1 W AH0 L T EH1 L Y UW1 AY1 F AY1 T F ER0 K AA1 M Y AH0 N IH2 Z AH0 M sp}",
+      "pitch_sketch": "tests/tenx2/sketches/LJ042-0043_A.npy",
+      "energy_sketch": "data/dataset/metadata/ljspeech/phoneme_level/energy/LJSpeech-energy-LJ042-0043.npy",
+      "pitch": "",
+      "energy": "",
+      "duration": "data/dataset/metadata/ljspeech/phoneme_level/duration/LJSpeech-duration-LJ042-0043.npy"
+    },
+    {
+      "wav": "wavs/LJ013-0041.wav",
+      "transcription": "He was an honest sea-captain, he said, trading from Liverpool, where once he had the misfortune to be introduced to a man of wealth,",
+      "phonemes": "{HH IY1 W AH1 Z AE1 N AA1 N AH0 S T S IY1 K AE1 P T AH0 N HH IY1 S EH1 D sp T R EY1 D IH0 NG F R AH1 M L IH1 V ER0 P UW2 L sp HH W EH1 R W AH1 N S HH IY1 HH AE1 D DH IY0 M IH0 S F AO1 R CH AH0 N T IH0 B IY0 IH2 N T R AH0 D UW1 S T T UW1 AH0 M AE1 N AH0 V sp W EH1 L TH}",
+      "pitch_sketch": "tests/tenx2/sketches/LJ013-0041_A.npy",
+      "energy_sketch": "data/dataset/metadata/ljspeech/phoneme_level/energy/LJSpeech-energy-LJ013-0041.npy",
+      "pitch": "",
+      "energy": "",
+      "duration": "data/dataset/metadata/ljspeech/phoneme_level/duration/LJSpeech-duration-LJ013-0041.npy"
+    },
+    {
+      "wav": "wavs/LJ012-0202.wav",
+      "transcription": "They pursued their terrible trade for five years without scruple and without detection.",
+      "phonemes": "{DH EY1 P ER0 S UW1 D DH EH1 R T EH1 R AH0 B AH0 L T R EY1 D F R ER0 F AY1 V Y IH1 R Z W IH0 DH AW1 T S K R UW1 P AH0 L sp AE1 N D W IH0 DH AW1 T D IH0 T EH1 K SH AH0 N sp}",
+      "pitch_sketch": "tests/tenx2/sketches/LJ012-0202_A.npy",
+      "energy_sketch": "data/dataset/metadata/ljspeech/phoneme_level/energy/LJSpeech-energy-LJ012-0202.npy",
+      "pitch": "",
+      "energy": "",
+      "duration": "data/dataset/metadata/ljspeech/phoneme_level/duration/LJSpeech-duration-LJ012-0202.npy"
+    },
+    {
+      "wav": "wavs/LJ049-0056.wav",
+      "transcription": "The first duty of the agents in the motorcade is to attempt to cover the President as closely as possible and practicable",
+      "phonemes": "{DH AH0 F ER1 S T D Y UW1 T IY0 AH0 V DH IY0 EY1 JH AH0 N T S IH0 N DH AH0 spn sp IH1 Z T UW1 AH0 T EH1 M P T T AH0 K AH1 V ER0 DH AH0 P R EH1 Z IH0 D AH0 N T EH1 Z K L OW1 S L IY0 EH1 Z P AA1 S AH0 B AH0 L sp AE1 N D P R AE1 K T AH0 K AH0 B AH0 L sp}",
+      "pitch_sketch": "tests/tenx2/sketches/LJ049-0056_A.npy",
+      "energy_sketch": "data/dataset/metadata/ljspeech/phoneme_level/energy/LJSpeech-energy-LJ049-0056.npy",
+      "pitch": "",
+      "energy": "",
+      "duration": "data/dataset/metadata/ljspeech/phoneme_level/duration/LJSpeech-duration-LJ049-0056.npy"
+    },
+    {
+      "wav": "wavs/LJ026-0052.wav",
+      "transcription": "In the nutrition of the animal the most essential and characteristic part of the food supply is derived from vegetable",
+      "phonemes": "{IH1 N DH AH1 N UW0 T R IH1 SH AH0 N AH0 V DH IY0 AE1 N AH0 M AH0 L sp DH AH0 M OW1 S T IY0 S EH1 N CH AH0 L AH0 N D sp K EH2 R AH0 K T ER0 IH1 S T IH0 K P AA1 R T AH0 V DH AH0 F UW1 D S AH0 P L AY1 sp IH1 Z D ER0 AY1 V D F ER0 M V EH1 JH T AH0 B AH0 L sp}",
+      "pitch_sketch": "tests/tenx2/sketches/LJ026-0052_A.npy",
+      "energy_sketch": "data/dataset/metadata/ljspeech/phoneme_level/energy/LJSpeech-energy-LJ026-0052.npy",
+      "pitch": "",
+      "energy": "",
+      "duration": "data/dataset/metadata/ljspeech/phoneme_level/duration/LJSpeech-duration-LJ026-0052.npy"
+    },
+    {
+      "wav": "wavs/LJ037-0255.wav",
+      "transcription": "testified that Commission Exhibit Number one sixty-two was the jacket worn by the man they saw on November twenty-two.",
+      "phonemes": "{T EH1 S T AH0 F AY2 D DH AE1 T sp K AH0 M IH1 SH AH0 N IH0 G Z IH1 B IH0 T N AH1 M B ER0 W AH1 N S IH1 K S T IY0 T UW1 W AH1 Z DH AH0 JH AE1 K IH0 T W AO1 R N B AY1 DH AH0 M AE1 N DH EY1 S AO1 sp AA1 N N OW0 V EH1 M B ER0 T W EH1 N T IY0 T UW1 sp}",
+      "pitch_sketch": "tests/tenx2/sketches/LJ037-0255_A.npy",
+      "energy_sketch": "data/dataset/metadata/ljspeech/phoneme_level/energy/LJSpeech-energy-LJ037-0255.npy",
+      "pitch": "",
+      "energy": "",
+      "duration": "data/dataset/metadata/ljspeech/phoneme_level/duration/LJSpeech-duration-LJ037-0255.npy"
+    },
+    {
+      "wav": "wavs/LJ019-0292.wav",
+      "transcription": "Prisoners still slept two in a bed.",
+      "phonemes": "{P R IH1 Z AH0 N ER0 Z sp S T IH1 L S L EH1 P T T UW1 IH0 N AH0 B EH1 D sp}",
+      "pitch_sketch": "tests/tenx2/sketches/LJ019-0292_A.npy",
+      "energy_sketch": "data/dataset/metadata/ljspeech/phoneme_level/energy/LJSpeech-energy-LJ019-0292.npy",
+      "pitch": "",
+      "energy": "",
+      "duration": "data/dataset/metadata/ljspeech/phoneme_level/duration/LJSpeech-duration-LJ019-0292.npy"
+    }
+  ]
+}

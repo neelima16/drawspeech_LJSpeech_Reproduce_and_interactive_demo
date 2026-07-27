@@ -1,23 +1,40 @@
-__pycache__
-taming
-log
-esc50.zip
-ESC-50-master
-ckpt
-lightning_logs
-mlx_submit_*
-job_queue.sh
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.cache/
+
+# Large external repos
+taming/
+taming-transformers/
+
+# Training logs and generated audio
+log/
+logs/
 *.wav
-# *.txt
-*.cleaned
-*.tar
-*.npy
+*.mp3
+
+# Large data files
+data/dataset/LJSpeech-1.1/
+data/checkpoints/
+data/dataset/metadata/ljspeech/phoneme_level/
+data/dataset/metadata/ljspeech/pitch_cross_sketches/
+data/dataset/metadata/ljspeech/energy_cross_sketches/
+
+# Debug/temp files
+debug_*.npy
+predicted_*.npy
+synthesized_*.npy
+input_*.npy
+Reload
+
+# Requirements lock
+requirements.lock.txt
+
+# IDE
+.vscode/
+.idea/
+
+# Misc
 *.TextGrid
-TextGrid
-LJSpeech-1.1
-condor*
-wandb
-temp.py
-temp
-tests
-test.yaml
+Delete_Preprocessing.sbatch
