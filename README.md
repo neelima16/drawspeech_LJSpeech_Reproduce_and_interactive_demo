@@ -107,12 +107,8 @@ Download from [Google Drive](https://drive.google.com/drive/folders/1DBRkALpPd6F
 
 ### Checkpoints
 Download from [HuggingFace](https://huggingface.co/HappyColor/DrawSpeech/tree/main):
-```
-data/checkpoints/
-├── vae.ckpt
-├── drawspeech.ckpt
-└── LJ_V1/
-```
+
+Place the checkpoints into data/checkpoints/
 
 # 1. Extract the main LJSpeech dataset
 tar -xjf LJSpeech-1.1.tar.bz2
