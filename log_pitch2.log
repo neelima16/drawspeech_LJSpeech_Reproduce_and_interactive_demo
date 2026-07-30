@@ -1,0 +1,49 @@
+Message actions  Reply to sender Reply to list or to sender and all recipients Forward the message   Open in new window
+Subject:pitch cross nodur
+Contact photo
+From	Bhavsar, Dhrutiv <dhrutiv.bhavsar@fau.de>	Date	Today 00:47
+Message Body
+Use ddim sampler
+Data shape for DDIM sampling is (1, 8, 216, 20), eta 1.0
+Running DDIM Sampling with 200 timesteps
+Non-fatal Warning [dataset.py]: The wav path " wavs/LJ037-0115.wav " is not find in the metadata. Use empty waveform instead. This is normal in the inference process.
+Given pitch_sketch: True | Given energy_sketch: True
+Given pitch: False | Given energy: False | Given phoneme_duration: False
+Use ddim sampler
+Data shape for DDIM sampling is (1, 8, 216, 20), eta 1.0
+Running DDIM Sampling with 200 timesteps
+Non-fatal Warning [dataset.py]: The wav path " wavs/LJ032-0259.wav " is not find in the metadata. Use empty waveform instead. This is normal in the inference process.
+Given pitch_sketch: True | Given energy_sketch: True
+Given pitch: False | Given energy: False | Given phoneme_duration: False
+Use ddim sampler
+Data shape for DDIM sampling is (1, 8, 216, 20), eta 1.0
+Running DDIM Sampling with 200 timesteps
+Plotting: Restored training weights
+RMSE dir: log/latent_diffusion/config/drawspeech_ljspeech_22k/infer_07-30-18:59_cfg_scale_3.5_ddim_200_n_cand_1
+Processed 289 files (skipped 0)
+Average Pitch RMSE: 32.37 Hz
+Average Energy RMSE: 4.70 dB
+finished: Thu Jul 30 08:31:45 PM CEST 2026
+=== JOB_STATISTICS ===
+=== current date     : Thu Jul 30 08:31:45 PM CEST 2026
+= Job-ID             : 1765335 on tinygpu
+= Job-Name           : pitch_cross_nodur
+= Job-Command        : /home/hpc/iwi5/iwi5408h/repro1/drawspeech_LJSpeech_Reproduce_and_interactive_demo/run_pitch_cross_nodur.sbatch
+= Initial workdir    : /home/hpc/iwi5/iwi5408h/repro1/drawspeech_LJSpeech_Reproduce_and_interactive_demo
+= Queue/Partition    : work
+= Slurm account      : iwi5 with QOS=normal
+= Requested resources:  for 03:00:00
+= Elapsed runtime    : 01:36:53
+= Total RAM usage    : 6.1 GiB of requested  GiB (%)
+= Node list          : tg080
+= Subm/Elig/Start/End: 2026-07-30T18:54:51 / 2026-07-30T18:54:51 / 2026-07-30T18:54:52 / 2026-07-30T20:31:45
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace
+    /home/woody             0.0K  1000.0G  1500.0G        N/A       2    5,000K   7,500K        N/A
+!!! /home/hpc             127.6G   104.9G   209.7G  -29039days     603K     500K   1,000K  -29039days !!!
+    /home/vault             0.0K  1048.6G  2097.2G        N/A       1      200K     400K        N/A
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA GeForce RTX 3080, 00000000:B1:00.0, 1992558, 43 %, 24 %, 2386 MiB, 5720961 ms
