@@ -73,11 +73,12 @@ This creates `data/checkpoints/drawspeech_fixed.ckpt`.
 ## Environment Setup
 
 ```bash
-conda env create -f environment.yml
-conda activate drawspeech
 
 git clone https://github.com/CompVis/taming-transformers.git
 cd taming-transformers && pip install -e . && cd ..
+
+conda env create -f environment.yml
+conda activate drawspeech
 
 export PYTHONPATH=$(pwd):$(pwd)/taming-transformers:$PYTHONPATH
 ```
