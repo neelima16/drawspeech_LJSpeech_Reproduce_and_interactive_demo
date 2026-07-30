@@ -114,6 +114,13 @@ data/checkpoints/
 └── LJ_V1/
 ```
 
+# 1. Extract the main LJSpeech dataset
+tar -xjf LJSpeech-1.1.tar.bz2
+
+# 2. Extract the alignments (LJSpeech.zip) into the LJSpeech-1.1 folder
+unzip LJSpeech.zip -d LJSpeech-1.1/
+
+
 Then run:
 ```bash
 python fix_drawspeech.py
