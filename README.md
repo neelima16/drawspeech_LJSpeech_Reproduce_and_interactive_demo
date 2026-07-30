@@ -169,12 +169,9 @@ The Streamlit app is still being polished, but it is functional on a GPU node.
    ```bash
    ssh -L 8501:<GPU_HOST>:8501 <username>@<LOGIN_NODE>
    ```
-   *Example:*  
-   ```bash
-   ssh -L 8501:tg090:8501 iwi5408h@csnhr.nhr.fau.de
-   ```
+   
 
-3. Open your browser at `http://localhost:8501` (or use a different local port if 8501 is occupied, e.g., `-L 8502:tg090:8501` and visit `http://localhost:8502`).
+3. Open your browser at `http://localhost:8501` (or use a different local port if 8501 is occupied, e.g., `-L 8502:tgxxx:8501` and visit `http://localhost:8502`).
 
 **Features:**
 - Word‑level and phoneme‑level pitch sliders.
