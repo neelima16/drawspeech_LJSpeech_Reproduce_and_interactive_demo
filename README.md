@@ -208,16 +208,6 @@ The Streamlit app is still being polished, but it is functional on a GPU node.
     └── dataset/                  # LJSpeech and alignments
 ```
 
----
-
-## Monte Carlo Sampling
-
-DrawSpeech uses DDIM sampling (200 steps) during inference. Outputs are stochastic — use a fixed seed for reproducibility:
-
-```python
-from pytorch_lightning import seed_everything
-seed_everything(0)
-```
 
 ---
 
