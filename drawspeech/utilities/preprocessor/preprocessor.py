@@ -1,9 +1,7 @@
 import os
-from posixpath import basename
 import random
 import json
 import argparse
-from tracemalloc import start
 import yaml
 
 import tgt
@@ -69,40 +67,29 @@ class Preprocessor:
         energy_scaler = StandardScaler()
 
         # Compute pitch, energy, duration, and mel-spectrogram        
-        # speaker = "LJSpeech"
-        # for wav_name in tqdm(os.listdir(self.in_dir)):
-        speakers = {}
+        speaker = "LJSpeech"
+        for wav_name in tqdm(os.listdir(self.in_dir)):
+            if ".wav" not in wav_name:
+                continue
 
-        for i, speaker in enumerate(os.listdir(self.in_dir)):
-            speakers[speaker] = i
-
-            for wav_name in os.listdir(
-                os.path.join(self.in_dir, speaker)
-            ):
-                if ".wav" not in wav_name:
+            basename = wav_name.split(".")[0]
+            tg_path = os.path.join(
+                self.out_dir, "TextGrid", speaker, "{}.TextGrid".format(basename)
+            )
+            if os.path.exists(tg_path):
+                ret = self.process_utterance(speaker, basename)
+                if ret is None:
                     continue
+                else:
+                    info, pitch, energy, n = ret
+                out.append(info)
 
-                # PATCH: init so a missing TextGrid can't leave these unbound
-                pitch, energy, n = [], [], 0
+            if len(pitch) > 0:
+                pitch_scaler.partial_fit(pitch.reshape((-1, 1)))
+            if len(energy) > 0:
+                energy_scaler.partial_fit(energy.reshape((-1, 1)))
 
-                basename = wav_name.split(".")[0]
-                tg_path = os.path.join(
-                    self.out_dir, "TextGrid", speaker, "{}.TextGrid".format(basename)
-                )
-                if os.path.exists(tg_path):
-                    ret = self.process_utterance(speaker, basename)
-                    if ret is None:
-                        continue
-                    else:
-                        info, pitch, energy, n = ret
-                    out.append(info)
-
-                if len(pitch) > 0:
-                    pitch_scaler.partial_fit(pitch.reshape((-1, 1)))
-                if len(energy) > 0:
-                    energy_scaler.partial_fit(energy.reshape((-1, 1)))
-
-                n_frames += n
+            n_frames += n
 
         print("Computing statistic quantities ...")
         # Perform normalization if necessary
@@ -127,9 +114,9 @@ class Preprocessor:
             os.path.join(self.out_dir, "energy"), energy_mean, energy_std
         )
 
-        # Save speaker mapping
-        with open(os.path.join(self.out_dir, "speakers.json"), "w") as f:
-            json.dump(speakers, f)
+        # Save files
+        # with open(os.path.join(self.out_dir, "speakers.json"), "w") as f:
+        #     f.write(json.dumps(speakers))
 
         with open(os.path.join(self.out_dir, "stats.json"), "w") as f:
             stats = {
@@ -171,12 +158,7 @@ class Preprocessor:
         return out
 
     def process_utterance(self, speaker, basename):
-        # wav_path = os.path.join(self.in_dir, "{}.wav".format(basename))
-        wav_path = os.path.join(
-            self.in_dir,
-            speaker,
-            "{}.wav".format(basename)
-        )
+        wav_path = os.path.join(self.in_dir, "{}.wav".format(basename))
         # text_path = os.path.join(self.in_dir, speaker, "{}.lab".format(basename))
         tg_path = os.path.join(
             self.out_dir, "TextGrid", speaker, "{}.TextGrid".format(basename)
@@ -191,24 +173,18 @@ class Preprocessor:
         if start >= end:
             return None
         
-        # assert start == 0, "start time is not 0, which may cause misalignment"
-        if start != 0:
-            print(f"Warning: {basename} starts at {start:.4f}s")
-        
+        assert start == 0, "start time is not 0, which may cause misalignment"
+
         # Read and trim wav files
         wav, _ = librosa.load(wav_path)
         wav = wav[
             int(self.sampling_rate * start) : int(self.sampling_rate * end)
         ].astype(np.float32)
 
-        text_path = os.path.join(
-            self.in_dir,
-            speaker,
-            "{}.lab".format(basename)
-        )
-
-        with open(text_path, "r", encoding="utf-8") as f:
-            raw_text = f.readline().strip()
+        # Read raw text
+        # with open(text_path, "r") as f:
+        #     raw_text = f.readline().strip("\n")
+        raw_text = ""
 
         # Compute fundamental frequency
         pitch, t = pw.dio(

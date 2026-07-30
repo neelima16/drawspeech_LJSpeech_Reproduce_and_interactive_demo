@@ -1,23 +1,13 @@
 {
     "ljspeech": "./data/dataset/LJSpeech-1.1",
 
-    "libritts": "./data/dataset",
-
-    "metadata": {
+    "metadata":{
         "path": {
-
-            "ljspeech": {
-                "train": "./data/dataset/metadata/ljspeech/train.json",
+            "ljspeech":{
+                "train": "./data/dataset/metadata/ljspeech/train.json", 
                 "test": "./data/dataset/metadata/ljspeech/test.json",
                 "val": "./data/dataset/metadata/ljspeech/val.json"
-            },
-
-            "libritts": {
-                "train": "./data/dataset/metadata/libritts/train.json",
-                "test": "./data/dataset/metadata/libritts/test.json",
-                "val": "./data/dataset/metadata/libritts/val.json"
             }
-
         }
     }
 }

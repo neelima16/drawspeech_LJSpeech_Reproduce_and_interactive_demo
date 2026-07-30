@@ -1,16 +1,10 @@
 dataset: "LJSpeech"
 
-# path:
-#   corpus_path: "data/dataset/LJSpeech-1.1"
-#   TextGrid_path: "data/dataset/LJSpeech-1.1/TextGrid"
-#   raw_path: "data/dataset/LJSpeech-1.1/wavs"
-#   preprocessed_path: "data/dataset/metadata/ljspeech/phoneme_level"
 path:
-    raw_path: "data/dataset/LibriTTS_raw"
-
-    preprocessed_path: "drawspeech/preprocessed_data/LibriTTS"
-
-    TextGrid_path: "data/dataset/LibriTTS/TextGrid"
+  corpus_path: "data/dataset/LJSpeech-1.1"
+  TextGrid_path: "data/dataset/LJSpeech-1.1/TextGrid"
+  raw_path: "data/dataset/LJSpeech-1.1/wavs"
+  preprocessed_path: "data/dataset/metadata/ljspeech/phoneme_level"
 
 preprocessing:
   audio:
