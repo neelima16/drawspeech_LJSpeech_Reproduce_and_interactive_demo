@@ -31,14 +31,35 @@ This repository reproduces [DrawSpeech](https://arxiv.org/abs/2501.04256) (ICASS
 ---
 
 ## Key Results
+We have done some experiments to check teh results. 
+1. 10 Samples (Random)
+   ## Experiment: Pitch Transfer with Known Timing
 
-| Metric | Value |
-|--------|-------|
-| Pitch RMSE (cross‑utterance) | 34.18 Hz |
-| Energy RMSE (cross‑utterance) | 4.54 dB |
+We took the pitch pattern from one sentence and applied it to a different sentence,
+while telling the model exactly how long each sound should last (using the original recording's timing).
 
-See [`RESULTS.md`](RESULTS.md) for the full experiment log.
+**How close was the generated speech to the target recording?**
+Pitch RMSE: 34.11 Hz | Energy RMSE: 4.52 dB
+→ The generated speech closely matched the target — low error because timing was perfect.
 
+**How different was the generated speech from the pitch source?**
+Pitch RMSE: 82.47 Hz | Energy RMSE: 20.93 dB
+→ Very different from the source, as expected — we only borrowed its pitch shape,
+  not its words or timing.
+
+2. 300 Samples Pitch study with no duration (using crossutterance) 
+Pitch RMSE = 50.10 Hz
+Energy RMSE = 11.04 dB
+
+3. 300 samples pitch study with duration provided (using crossutterance)
+Average Pitch RMSE: 32.37 Hz
+Average Energy RMSE: 4.70 dB
+
+4. Energy sketch study
+   To be discussed
+
+   These values change because, the preprocessing in author's original code uses randomisation. It is kept to be close the original code. But, teh trend, difference between them is the same.
+   
 ---
 
 ## Setup
