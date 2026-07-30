@@ -1,66 +1,101 @@
 
 # DrawSpeech — LJSpeech Reproduction and Interactive Demo
 
-This repository contains a reproduction of [DrawSpeech](https://arxiv.org/abs/2501.04256) (ICASSP 2025) on the **LJSpeech** dataset, along with cross-utterance prosody transfer experiments and an interactive Streamlit demo.
+This repository reproduces [DrawSpeech](https://arxiv.org/abs/2501.04256) (ICASSP 2025) on the **LJSpeech** dataset, adds cross-utterance prosody transfer experiments, and provides an interactive Streamlit demo.
 
-**Original Paper:** [[Paper]](https://ieeexplore.ieee.org/abstract/document/10889767) [[arXiv]](https://arxiv.org/abs/2501.04256) [[Demo]](https://happycolor.github.io/DrawSpeech/)
+**Original Paper:** [[Paper]](https://ieeexplore.ieee.org/abstract/document/10889767) [[arXiv]](https://arxiv.org/abs/2501.04256) [[Demo]](https://happycolor.github.io/DrawSpeech/)  
 **Original Code:** [HappyColor/DrawSpeech_PyTorch](https://github.com/HappyColor/DrawSpeech_PyTorch)
 
 ---
 
 ## What This Repository Contains
 
-```
-1. Reproduction of DrawSpeech on LJSpeech (single speaker)
-   - Fixed 4 bugs in original codebase
-   - Fixed checkpoint key mismatch (drawspeech_fixed.ckpt)
-   - Evaluated pitch and energy RMSE
+- **Reproduction of DrawSpeech on LJSpeech** (single speaker)  
+  - Fixed 4 bugs in the original codebase.  
+  - Fixed checkpoint key mismatch (`drawspeech_fixed.ckpt`).  
+  - Evaluated pitch and energy RMSE.
 
-2. Cross-utterance prosody transfer experiments
-   - Pitch cross-utterance (sketch from different sentence)
-   - Energy cross-utterance (energy sketch from different sentence)
-   - With and without duration conditioning
+- **Cross‑utterance prosody transfer experiments**  
+  - Pitch transfer (sketch from a different sentence).  
+  - Energy transfer (energy sketch from a different sentence).  
+  - With and without duration conditioning.
 
-3. Interactive Streamlit Demo (app.py)
-   - Word-level pitch sliders
-   - Phoneme-level pitch sliders
-   - Real-time audio generation
-   - Sketch vs generated pitch visualization
-   - Sketch refinement pipeline
+- **Interactive Streamlit demo (`app.py`)**  
+  - Word‑level and phoneme‑level pitch sliders.  
+  - Real‑time audio generation.  
+  - Sketch vs. generated pitch visualization (Figures 2 and 3 from the paper).  
+  - Sketch refinement pipeline (Savitzky‑Golay smoothing + normalisation).
 
-4. 10x2 sketch experiments
-   - Same sentence with different sketch intensities
-```
+- **10×2 sketch experiments** – same sentence with different sketch intensities.
 
 ---
 
 ## Key Results
 
-### Pitch Cross-Utterance (LJSpeech test set, 300 utterances)
+| Metric | Value |
+|--------|-------|
+| Pitch RMSE (cross‑utterance) | 34.18 Hz |
+| Energy RMSE (cross‑utterance) | 4.54 dB |
 
-```
-Pitch RMSE:   34.18 Hz
-Energy RMSE:   4.54 dB
-```
-
-See `RESULTS.md` for full experiment log.
+See [`RESULTS.md`](RESULTS.md) for the full experiment log.
 
 ---
 
-## Bug Fixes in Original Code
+## Setup
 
-```
-1. stft.py: pad_center keyword argument (librosa API change)
-2. fastspeech2/modules.py: missing mel_mask computation
-3. ddpm.py: undefined CLAP reference, strict=False loading
-4. infer.py: handles both checkpoint formats
+### Environment
+
+```bash
+# Optional: set proxies if behind a firewall
+export http_proxy=http://proxy.nhr.fau.de:80
+export https_proxy=http://proxy.nhr.fau.de:80
+
+conda env create -f environment.yml
+conda activate drawspeech
+
+# Install taming‑transformers (required for VAE)
+git clone https://github.com/CompVis/taming-transformers.git
+cd taming-transformers
+pip install -e .
+cd ..
+export PYTHONPATH=$(pwd):$(pwd)/taming-transformers:$PYTHONPATH
 ```
 
 ---
 
-## Checkpoint Key Mismatch Fix
+## Dataset & Checkpoints
 
-The released `drawspeech.ckpt` has old layer names. Fix with:
+### LJSpeech Dataset
+
+1. Download from [keithito.com](https://keithito.com/LJ-Speech-Dataset/) and place the archive in `data/dataset/`.
+2. Extract the main dataset and alignments:
+   ```bash
+   cd data/dataset
+   tar -xjf LJSpeech-1.1.tar.bz2
+   unzip LJSpeech.zip -d LJSpeech-1.1/   # alignments
+   ```
+   The final structure should be:
+   ```
+   data/dataset/LJSpeech-1.1/
+   ├── metadata.csv
+   ├── wavs/
+   │   └── *.wav
+   └── *.[TextGrid|lab]          # alignment files
+   ```
+
+### Checkpoints
+
+Download the pretrained checkpoints from [HuggingFace](https://huggingface.co/HappyColor/DrawSpeech/tree/main) and place them in `data/checkpoints/`.
+
+**If the downloaded checkpoint is broken** (e.g., `generator_v1` is a 0‑byte file), remove it and fetch a working copy from the mirror:
+
+```bash
+rm -f data/checkpoints/LJ_V1/generator_v1
+curl -L -o data/checkpoints/LJ_V1/generator_v1 \
+  "https://drive.usercontent.google.com/download?id=1qpgI41wNXFcH-iKq1Y42JlBC9j0je8PW&export=download"
+```
+
+Then fix the checkpoint key mismatch:
 
 ```bash
 python fix_drawspeech.py
@@ -70,102 +105,47 @@ This creates `data/checkpoints/drawspeech_fixed.ckpt`.
 
 ---
 
-## Environment Setup
+## Preprocessing
 
-```bash
-
-#if needed, enable 
-export http_proxy=http://proxy.nhr.fau.de:80
-export https_proxy=http://proxy.nhr.fau.de:80
-
-conda env create -f environment.yml
-conda activate drawspeech
-
-git clone https://github.com/CompVis/taming-transformers.git
-cd taming-transformers
-pip install -e .
-cd ..
-export PYTHONPATH=$(pwd):$(pwd)/taming-transformers:$PYTHONPATH
-
-
-```
-
----
-
-## Dataset and Checkpoints
-
-### LJSpeech
-Download from https://keithito.com/LJ-Speech-Dataset/ and place at:
-```
-data/dataset/LJSpeech-1.1/
-├── metadata.csv
-└── wavs/
-```
-
-### Alignments
-Download from [Google Drive](https://drive.google.com/drive/folders/1DBRkALpPd6FL9gjHMmMEdHODmkgNIIK4) and unzip into `data/dataset/LJSpeech-1.1/`.
-
-### Checkpoints
-Download from [HuggingFace](https://huggingface.co/HappyColor/DrawSpeech/tree/main):
-
-Place the checkpoints into data/checkpoints/
-
-# 1. Extract the main LJSpeech dataset
-tar -xjf LJSpeech-1.1.tar.bz2
-
-# 2. Extract the alignments (LJSpeech.zip) into the LJSpeech-1.1 folder
-unzip LJSpeech.zip -d LJSpeech-1.1/
-
-
-Then run:
-```bash
-python fix_drawspeech.py
-```
-
-### Preprocessing
+Extract features (mel‑spectrograms, pitch, energy, duration) with:
 
 ```bash
 python preprocessing.py
 ```
 
+> **Note:** `preprocessing.py` shuffles the dataset for training/validation split. The shuffle uses a fixed random seed, so results are reproducible. If you want the exact same split as used in our experiments, ensure you do not change the seed.
+
 ---
 
 ## Experiments
 
-### Pitch Cross-Utterance (with duration)
+All experiments are submitted via SLURM scripts. Each script sets the appropriate config and runs inference.
 
+### Pitch Cross‑Utterance (with duration)
 ```bash
 sbatch run_pitch_cross.sbatch
 ```
 
-### Pitch Cross-Utterance (without duration)
-
+### Pitch Cross‑Utterance (without duration)
 ```bash
 sbatch run_pitch_cross_nodur.sbatch
 ```
 
-### Energy Cross-Utterance
-
+### Energy Cross‑Utterance
 ```bash
 sbatch run_energy_cross.sbatch
 ```
 
-### 10x2 Sketch Experiments
-
+### 10×2 Sketch Experiments
 ```bash
 sbatch run_10x2_sketches.sbatch
 ```
-Sometimes, the chcekpoint can be broken, 
-use this to fix 
-# Remove the broken file
-rm -f ~/repro1/drawspeech_LJSpeech_Reproduce_and_interactive_demo/data/checkpoints/LJ_V1/generator_v1
 
-# Download from the reliable mirror (Google Drive)
-curl -L -o ~/repro1/drawspeech_LJSpeech_Reproduce_and_interactive_demo/data/checkpoints/LJ_V1/generator_v1 \
-  "https://drive.usercontent.google.com/download?id=1qpgI41wNXFcH-iKq1Y42JlBC9j0je8PW&export=download"
 ---
 
 ## Compute RMSE
+
+After generating audio, compute RMSE against the original LJSpeech wavs:
 
 ```bash
 python compute_rmse.py \
@@ -175,103 +155,67 @@ python compute_rmse.py \
 
 ---
 
+## Interactive Demo (Streamlit)
 
-## Interactive demo (work in progress)
+The Streamlit app is still being polished, but it is functional on a GPU node.
 
-An interactive Streamlit app lets you **draw pitch sketches** or use **word/phoneme sliders** and hear the result in real time. The app is still being polished, but you can test it on a GPU node:
+1. **On the GPU node**, run:
+   ```bash
+   export PYTHONPATH=$(pwd):$(pwd)/taming-transformers:$PYTHONPATH
+   streamlit run app.py --server.port 8501 --server.address 0.0.0.0
+   ```
 
-```bash
-export PYTHONPATH=$(pwd):$(pwd)/taming-transformers:$PYTHONPATH
-streamlit run app.py --server.port 8501 --server.address 0.0.0.0
-```
+2. **From your local machine**, create an SSH tunnel. Replace `<GPU_HOST>` with the actual hostname (e.g., `tg090`) and `<LOGIN_NODE>` with your cluster's login address (e.g., `csnhr.nhr.fau.de`):
+   ```bash
+   ssh -L 8501:<GPU_HOST>:8501 <username>@<LOGIN_NODE>
+   ```
+   *Example:*  
+   ```bash
+   ssh -L 8501:tg090:8501 iwi5408h@csnhr.nhr.fau.de
+   ```
 
-Then, from your **local machine**, create an SSH tunnel. Replace `<GPU_HOST>` with the actual hostname of the GPU node (e.g., `tg090`), and `<LOGIN_NODE>` with your cluster's login address (e.g., `tinyx` or `csnhr.nhr.fau.de`):
+3. Open your browser at `http://localhost:8501` (or use a different local port if 8501 is occupied, e.g., `-L 8502:tg090:8501` and visit `http://localhost:8502`).
 
-```bash
-ssh -L 8501:<GPU_HOST>:8501 <username>@<LOGIN_NODE>
-```
-
-For example, if your username is `iwi5408h` and the GPU node is `tg090`:
-
-```bash
-ssh -L 8501:tg090:8501 iwi5408h@csnhr.nhr.fau.de
-```
-
-Now open your browser and go to **http://localhost:8501**.  
-(If port 8501 is blocked locally, use `-L 8502:...` and open `http://localhost:8502`.)
-
----
-
-
-For a Mac user
-Start the Streamlit app on the GPU node (as shown in your README).
-
-Open Terminal on your Mac.
-
-Create the SSH tunnel (replace tg090 with the actual GPU hostname and csnhr.nhr.fau.de with your login node):
-```
-bash
-ssh -L 8501:tg090:8501 iwi5408h@csnhr.nhr.fau.de
-```
-If port 8501 is already in use on your Mac, use a different local port, e.g.:
-```
-bash
-ssh -L 8502:tg090:8501 iwi5408h@csnhr.nhr.fau.de
-```
-Keep the Terminal window open.
-
-Open your browser and go to http://localhost:8501 (or http://localhost:8502 if you used the alternate port).
-
-Features:
-- Word-level and phoneme-level pitch sliders
-- Real-time audio generation
-- Sketch vs generated pitch visualization (Figures 2 and 3 from paper)
-- Sketch refinement pipeline (Savitzky-Golay smoothing + normalization)
+**Features:**
+- Word‑level and phoneme‑level pitch sliders.
+- Real‑time audio generation.
+- Sketch vs. generated pitch visualisation.
+- Sketch refinement pipeline (smoothing + normalisation).
 
 ---
 
 ## Repository Structure
 
 ```
-DrawSpeech_PyTorch/
+.
 ├── app.py                        # Streamlit interactive demo
 ├── sketch_adapter.py             # Sketch refinement pipeline
 ├── fix_drawspeech.py             # Checkpoint key mismatch fix
 ├── preprocessing.py              # Feature extraction
 ├── compute_rmse.py               # RMSE evaluation
-├── compute_rmse_10_utterances.py # 10-utterance RMSE
-├── build_tenx2.py                # 10x2 sketch builder
-├── run_pitch_cross.sbatch        # Pitch cross experiment
-├── run_pitch_cross_nodur.sbatch  # Pitch cross (no duration)
-├── run_energy_cross.sbatch       # Energy cross experiment
-├── run_10x2_sketches.sbatch      # 10x2 sketch experiment
+├── compute_rmse_10_utterances.py # 10‑utterance RMSE
+├── build_tenx2.py                # 10×2 sketch builder
+├── run_*.sbatch                  # SLURM experiment scripts
 ├── environment.yml               # Conda environment
 ├── RESULTS.md                    # Experiment results log
 ├── drawspeech/
 │   ├── config/
 │   │   └── drawspeech_ljspeech_22k.yaml
-│   ├── conditional_models.py     # Core model
-│   ├── dataset_plugin.py         # Data loading
-│   ├── infer.py                  # Inference script
-│   └── modules/                  # Model components
-├── tests/
-│   ├── inference.json            # Basic inference test
-│   ├── inference_pitch_cross.json
-│   └── inference_energy_cross.json
+│   ├── conditional_models.py
+│   ├── dataset_plugin.py
+│   ├── infer.py
+│   └── modules/
+├── tests/                        # Inference JSON configs
 └── data/
-    └── dataset/
-        └── metadata/
-            └── ljspeech/
-                ├── train.json
-                ├── val.json
-                └── test.json
+    ├── checkpoints/              # Pretrained models
+    └── dataset/                  # LJSpeech and alignments
 ```
 
 ---
 
 ## Monte Carlo Sampling
 
-DrawSpeech uses DDIM sampling (200 steps) during inference. Outputs are stochastic — use fixed seed for reproducibility:
+DrawSpeech uses DDIM sampling (200 steps) during inference. Outputs are stochastic — use a fixed seed for reproducibility:
 
 ```python
 from pytorch_lightning import seed_everything
@@ -282,9 +226,9 @@ seed_everything(0)
 
 ## Acknowledgements
 
-* [AudioLDM](https://github.com/haoheliu/AudioLDM-training-finetuning)
-* [FastSpeech 2](https://github.com/ming024/FastSpeech2)
-* [HiFi-GAN](https://github.com/jik876/hifi-gan)
+- [AudioLDM](https://github.com/haoheliu/AudioLDM-training-finetuning)
+- [FastSpeech 2](https://github.com/ming024/FastSpeech2)
+- [HiFi‑GAN](https://github.com/jik876/hifi-gan)
 
 ---
 
@@ -300,3 +244,6 @@ seed_everything(0)
 }
 ```
 
+---
+
+**Do you approve these changes?** If yes, I'll apply them to your README. If you'd like further adjustments, please let me know.
