@@ -155,7 +155,14 @@ sbatch run_energy_cross.sbatch
 ```bash
 sbatch run_10x2_sketches.sbatch
 ```
+Sometimes, the chcekpoint can be broken, 
+use this to fix 
+# Remove the broken file
+rm -f ~/repro1/drawspeech_LJSpeech_Reproduce_and_interactive_demo/data/checkpoints/LJ_V1/generator_v1
 
+# Download from the reliable mirror (Google Drive)
+curl -L -o ~/repro1/drawspeech_LJSpeech_Reproduce_and_interactive_demo/data/checkpoints/LJ_V1/generator_v1 \
+  "https://drive.usercontent.google.com/download?id=1qpgI41wNXFcH-iKq1Y42JlBC9j0je8PW&export=download"
 ---
 
 ## Compute RMSE
