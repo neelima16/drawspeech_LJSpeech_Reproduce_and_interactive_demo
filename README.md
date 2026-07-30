@@ -74,8 +74,16 @@ This creates `data/checkpoints/drawspeech_fixed.ckpt`.
 
 ```bash
 
+#if needed, enable 
+export http_proxy=http://proxy.nhr.fau.de:80
+export https_proxy=http://proxy.nhr.fau.de:80
+
+
+
 git clone https://github.com/CompVis/taming-transformers.git
-cd taming-transformers && pip install -e . && cd ..
+cd taming-transformers
+pip install -e .
+cd ..
 
 conda env create -f environment.yml
 conda activate drawspeech
