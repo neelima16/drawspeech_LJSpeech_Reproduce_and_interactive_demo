@@ -175,11 +175,52 @@ python compute_rmse.py \
 
 ---
 
-## Interactive Demo
+
+## Interactive demo (work in progress)
+
+An interactive Streamlit app lets you **draw pitch sketches** or use **word/phoneme sliders** and hear the result in real time. The app is still being polished, but you can test it on a GPU node:
 
 ```bash
-streamlit run app.py
+export PYTHONPATH=$(pwd):$(pwd)/taming-transformers:$PYTHONPATH
+streamlit run app.py --server.port 8501 --server.address 0.0.0.0
 ```
+
+Then, from your **local machine**, create an SSH tunnel. Replace `<GPU_HOST>` with the actual hostname of the GPU node (e.g., `tg090`), and `<LOGIN_NODE>` with your cluster's login address (e.g., `tinyx` or `csnhr.nhr.fau.de`):
+
+```bash
+ssh -L 8501:<GPU_HOST>:8501 <username>@<LOGIN_NODE>
+```
+
+For example, if your username is `iwi5408h` and the GPU node is `tg090`:
+
+```bash
+ssh -L 8501:tg090:8501 iwi5408h@csnhr.nhr.fau.de
+```
+
+Now open your browser and go to **http://localhost:8501**.  
+(If port 8501 is blocked locally, use `-L 8502:...` and open `http://localhost:8502`.)
+
+---
+
+
+For a Mac user
+Start the Streamlit app on the GPU node (as shown in your README).
+
+Open Terminal on your Mac.
+
+Create the SSH tunnel (replace tg090 with the actual GPU hostname and csnhr.nhr.fau.de with your login node):
+```
+bash
+ssh -L 8501:tg090:8501 iwi5408h@csnhr.nhr.fau.de
+```
+If port 8501 is already in use on your Mac, use a different local port, e.g.:
+```
+bash
+ssh -L 8502:tg090:8501 iwi5408h@csnhr.nhr.fau.de
+```
+Keep the Terminal window open.
+
+Open your browser and go to http://localhost:8501 (or http://localhost:8502 if you used the alternate port).
 
 Features:
 - Word-level and phoneme-level pitch sliders
