@@ -60,10 +60,6 @@ Across runs of different sizes (10, 20, 300 samples), the results cluster tightl
 **Sanity check — distance from the pitch *source* (10 samples, with duration):**
 Pitch RMSE 82.47 Hz · Energy RMSE 20.93 dB — deliberately large, since only the pitch *shape* was borrowed, not the words or timing.
 
-### Energy sketch study
-
-_In progress._
-
 > **Note on variance.** Absolute numbers shift slightly between runs because the original preprocessing randomizes the train/val/test split. We keep this behavior to stay faithful to the original code; the **trends and the ~14 ~16 Hz with/without-duration gap remain consistent**.
 
 Major Learning : 
