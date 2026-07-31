@@ -9,20 +9,20 @@ This repository reproduces [DrawSpeech](https://arxiv.org/abs/2501.04256) (ICASS
 
 # Contents
 
-- Reproduction of DrawSpeech on LJSpeech (single speaker)
+- **Reproduction of DrawSpeech on LJSpeech** (single speaker)
   - Fixed four bugs in the original implementation.
   - Fixed the pretrained checkpoint key mismatch (`drawspeech_fixed.ckpt`).
   - Evaluated pitch and energy RMSE.
-- Cross-utterance prosody transfer
-  - Pitch transfer between different utterances.
-  - Energy transfer between different utterances.
+- **Cross-utterance prosody transfer**
+  - Pitch transfer from a source utterance to a different target utterance.
+  - Energy transfer from a source utterance to a different target utterance.
   - Experiments with and without duration conditioning.
-- Interactive Streamlit demo
+- **Interactive Streamlit demo**
   - Word-level and phoneme-level pitch sliders.
   - Real-time speech synthesis.
   - Sketch vs. generated pitch visualization.
   - Sketch refinement (Savitzky–Golay smoothing + normalization).
-- 10×2 sketch experiments.
+- **10×2 sketch experiments**
 
 ---
 
@@ -44,29 +44,29 @@ Providing real durations consistently lowers pitch RMSE by approximately **14–
 #### With duration
 
 | Run | Samples | Pitch RMSE | Energy RMSE |
-|-----|--------:|-----------:|------------:|
+|------|--------:|-----------:|------------:|
 | vs. target | 10 | 34.11 Hz | 4.52 dB |
 | Cross-utterance | 300 | 32.37 Hz | 4.70 dB |
 
 #### Without duration
 
 | Run | Samples | Pitch RMSE | Energy RMSE |
-|-----|--------:|-----------:|------------:|
+|------|--------:|-----------:|------------:|
 | Cross-utterance | 300 | 50.10 Hz | 11.04 dB |
 
 ### Sanity Check
 
-Comparing generated speech against the **source** utterance (instead of the target):
+Distance from the **source** utterance (10 samples, with duration):
 
 - Pitch RMSE: **82.47 Hz**
 - Energy RMSE: **20.93 dB**
 
-The error is intentionally large because only the pitch contour is transferred—not the words or timing.
+The error is intentionally large because only the pitch contour is transferred—not the linguistic content or timing.
 
 ### Energy Transfer
 
 | Run | Samples | Pitch RMSE | Energy RMSE |
-|-----|--------:|-----------:|------------:|
+|------|--------:|-----------:|------------:|
 | With duration | 300 | 32.37 Hz | 4.71 dB |
 | Without duration | 300 | 48.19 Hz | 10.93 dB |
 
@@ -74,7 +74,7 @@ Providing real durations reduces pitch RMSE by roughly **16 Hz** and cuts energy
 
 ### Main Takeaway
 
-The exact RMSE changes slightly because preprocessing randomly generates the train/validation split (using a fixed seed), but the trend is stable:
+The absolute RMSE varies slightly because preprocessing randomly generates the train/validation split (using a fixed seed), but the trend is consistent:
 
 | Condition | Pitch RMSE |
 |-----------|-----------:|
@@ -89,50 +89,102 @@ The exact RMSE changes slightly because preprocessing randomly generates the tra
 ## 1. Clone the repository
 
 ```bash
-git clone <your_repository_url>
+git clone <repository-url>
 cd DrawSpeech_LibriTTS
 ```
 
-## 2. Create the environment
+## 2. Create the conda environment
 
 ```bash
+# Optional: set proxies if behind a firewall
+export http_proxy=http://proxy.nhr.fau.de:80
+export https_proxy=http://proxy.nhr.fau.de:80
+
 conda env create -f environment.yml
 conda activate drawspeech
 ```
 
-If you are working behind a proxy:
+## 3. Download pretrained checkpoints
+
+Create the checkpoint directory.
 
 ```bash
-export http_proxy=http://proxy.nhr.fau.de:80
-export https_proxy=http://proxy.nhr.fau.de:80
+mkdir -p data/checkpoints/LJ_V1
 ```
 
----
-
-## 3. Automatic Setup (Recommended)
-
-Run
+Install the Hugging Face client.
 
 ```bash
-chmod +x setup.sh
-./setup.sh
+pip install huggingface_hub
 ```
 
-The setup script automatically
+Download the DrawSpeech checkpoints.
 
-- downloads the DrawSpeech checkpoints from Hugging Face,
-- downloads the HiFi-GAN vocoder,
-- clones and installs `taming-transformers`,
-- downloads the LPIPS VGG model,
-- creates the required directory structure.
+```bash
+python -c "
+from huggingface_hub import hf_hub_download
 
-Afterwards, fix the checkpoint naming:
+hf_hub_download(
+    repo_id='HappyColor/DrawSpeech',
+    filename='vae.ckpt',
+    local_dir='data/checkpoints'
+)
+
+hf_hub_download(
+    repo_id='HappyColor/DrawSpeech',
+    filename='drawspeech.ckpt',
+    local_dir='data/checkpoints'
+)
+"
+```
+
+Download the HiFi-GAN vocoder.
+
+```bash
+curl -L -o data/checkpoints/LJ_V1/config.json \
+https://raw.githubusercontent.com/jik876/hifi-gan/master/config_v1.json
+
+curl -L -o data/checkpoints/LJ_V1/generator_v1 \
+"https://drive.usercontent.google.com/download?id=1qpgI41wNXFcH-iKq1Y42JlBC9j0je8PW&export=download"
+```
+
+## 4. Install taming-transformers
+
+```bash
+git clone https://github.com/CompVis/taming-transformers.git
+
+cd taming-transformers
+pip install -e .
+cd ..
+```
+
+## 5. Download the LPIPS VGG model
+
+```bash
+mkdir -p taming/modules/autoencoder/lpips
+
+curl -L \
+-o taming/modules/autoencoder/lpips/vgg.pth \
+"https://heibox.uni-heidelberg.de/f/607503859c864bc1b30b/?dl=1"
+```
+
+## 6. Fix the checkpoint
+
+The released checkpoint uses different parameter names than expected by the inference code.
+
+Run:
 
 ```bash
 python fix_drawspeech.py
 ```
 
-Finally, expose the repository to Python:
+This creates
+
+```
+data/checkpoints/drawspeech_fixed.ckpt
+```
+
+## 7. Set the Python path
 
 ```bash
 export PYTHONPATH=$(pwd):$(pwd)/taming-transformers:$PYTHONPATH
@@ -142,7 +194,7 @@ export PYTHONPATH=$(pwd):$(pwd)/taming-transformers:$PYTHONPATH
 
 # Dataset
 
-Download **LJSpeech** from
+Download the **LJSpeech** dataset from
 
 https://keithito.com/LJ-Speech-Dataset/
 
@@ -152,7 +204,7 @@ Place the archive inside
 data/dataset/
 ```
 
-Then extract
+Extract the dataset and alignments.
 
 ```bash
 cd data/dataset
@@ -161,7 +213,7 @@ tar -xjf LJSpeech-1.1.tar.bz2
 unzip LJSpeech.zip -d LJSpeech-1.1/
 ```
 
-Expected directory:
+Expected directory structure:
 
 ```
 data/dataset/LJSpeech-1.1/
@@ -175,35 +227,39 @@ data/dataset/LJSpeech-1.1/
 
 # Preprocessing
 
-Extract mel spectrograms, pitch, duration and energy features.
+Extract mel spectrograms, pitch, energy and duration features.
 
 ```bash
 python preprocessing.py
 ```
 
+The preprocessing script uses a fixed random seed to create train and validation splits, making experiments reproducible.
+
 ---
 
-# Running Experiments
+# Experiments
 
 Experiments are executed through SLURM.
+
+### Pitch transfer (with duration)
 
 ```bash
 sbatch run_pitch_cross.sbatch
 ```
 
-Pitch transfer without duration
+### Pitch transfer (without duration)
 
 ```bash
 sbatch run_pitch_cross_nodur.sbatch
 ```
 
-Energy transfer
+### Energy transfer
 
 ```bash
 sbatch run_energy_cross.sbatch
 ```
 
-10×2 sketch experiment
+### 10×2 sketch experiment
 
 ```bash
 sbatch run_10x2_sketches.sbatch
@@ -213,6 +269,8 @@ sbatch run_10x2_sketches.sbatch
 
 # RMSE Evaluation
 
+Compute pitch and energy RMSE between generated and reference speech.
+
 ```bash
 python compute_rmse.py \
     --generated_dir log/latent_diffusion/config/drawspeech_ljspeech_22k/infer_* \
@@ -221,9 +279,9 @@ python compute_rmse.py \
 
 ---
 
-# Streamlit Demo
+# Interactive Demo (Streamlit)
 
-Start the application on the GPU node.
+Launch the demo on a GPU node.
 
 ```bash
 export PYTHONPATH=$(pwd):$(pwd)/taming-transformers:$PYTHONPATH
@@ -233,7 +291,7 @@ streamlit run app.py \
     --server.address 0.0.0.0
 ```
 
-Create an SSH tunnel from your local machine.
+From your local machine, create an SSH tunnel.
 
 ```bash
 ssh -L 8501:<GPU_HOST>:8501 <username>@<LOGIN_NODE>
@@ -245,7 +303,7 @@ Example
 ssh -L 8501:tg090:8501 user@csnhr.nhr.fau.de
 ```
 
-Then open
+Open
 
 ```
 http://localhost:8501
@@ -256,22 +314,21 @@ http://localhost:8501
 - Word-level pitch editing
 - Phoneme-level pitch editing
 - Real-time speech synthesis
-- Pitch visualization
-- Sketch refinement
+- Sketch vs. generated pitch visualization
+- Sketch refinement pipeline
 - Audio playback
 
-### Current Limitation
+### Limitation
 
-The released checkpoint was trained only using smoothed real pitch contours. It therefore follows manually drawn sketches only approximately, rather than exactly.
+The released checkpoint was trained using smoothed real pitch contours only. Consequently, manually drawn sketches or slider edits produce subtle changes rather than perfectly following arbitrary user input.
 
 ---
 
 # Repository Structure
 
-```
+```text
 .
 ├── app.py
-├── setup.sh
 ├── sketch_adapter.py
 ├── fix_drawspeech.py
 ├── preprocessing.py
@@ -282,6 +339,11 @@ The released checkpoint was trained only using smoothed real pitch contours. It 
 ├── environment.yml
 ├── RESULTS.md
 ├── drawspeech/
+│   ├── config/
+│   ├── modules/
+│   ├── infer.py
+│   ├── dataset_plugin.py
+│   └── conditional_models.py
 ├── tests/
 └── data/
     ├── checkpoints/
@@ -292,14 +354,19 @@ The released checkpoint was trained only using smoothed real pitch contours. It 
 
 # Acknowledgements
 
+This work builds upon the following open-source projects:
+
+- DrawSpeech
 - AudioLDM
 - FastSpeech2
 - HiFi-GAN
-- DrawSpeech
+- taming-transformers
 
 ---
 
 # Citation
+
+If you use this repository, please cite the original DrawSpeech paper.
 
 ```bibtex
 @inproceedings{chen2025drawspeech,
