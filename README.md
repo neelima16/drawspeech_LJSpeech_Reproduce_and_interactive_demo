@@ -147,7 +147,7 @@ Experiments are submitted via SLURM. Each script sets its config and runs infere
 ```bash
 sbatch run_pitch_cross.sbatch         # pitch cross-utterance (with duration)
 sbatch run_pitch_cross_nodur.sbatch   # pitch cross-utterance (without duration)
-sbatch run_energy_cross.sbatch        # energy cross-utterance
+sbatch run_energy_cross.sbatch        # energy cross-utterance (need more work done, future goal)
 sbatch run_10x2_sketches.sbatch       # 10×2 sketch experiments
 ```
 
