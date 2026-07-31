@@ -1,236 +1,305 @@
-
 # DrawSpeech — LJSpeech Reproduction and Interactive Demo
 
 This repository reproduces [DrawSpeech](https://arxiv.org/abs/2501.04256) (ICASSP 2025) on the **LJSpeech** dataset, adds cross-utterance prosody-transfer experiments, and provides an interactive Streamlit demo.
 
-**Original Paper:** [[IEEE]](https://ieeexplore.ieee.org/abstract/document/10889767) · [[arXiv]](https://arxiv.org/abs/2501.04256) · [[Demo]](https://happycolor.github.io/DrawSpeech/)
+**Original Paper:** [[IEEE]](https://ieeexplore.ieee.org/abstract/document/10889767) · [[arXiv]](https://arxiv.org/abs/2501.04256) · [[Demo]](https://happycolor.github.io/DrawSpeech/)  
 **Original Code:** [HappyColor/DrawSpeech_PyTorch](https://github.com/HappyColor/DrawSpeech_PyTorch)
 
 ---
 
-## Contents
+# Contents
 
-- **Reproduction of DrawSpeech on LJSpeech** (single speaker)
-  - Fixed 4 bugs in the original codebase.
-  - Fixed the checkpoint key mismatch (`drawspeech_fixed.ckpt`).
+- Reproduction of DrawSpeech on LJSpeech (single speaker)
+  - Fixed four bugs in the original implementation.
+  - Fixed the pretrained checkpoint key mismatch (`drawspeech_fixed.ckpt`).
   - Evaluated pitch and energy RMSE.
-- **Cross-utterance prosody transfer**
-  - Pitch transfer (sketch taken from a different sentence).
-  - Energy transfer (energy sketch from a different sentence).
-  - With and without duration conditioning.
-- **Interactive Streamlit demo (`app.py`)**
+- Cross-utterance prosody transfer
+  - Pitch transfer between different utterances.
+  - Energy transfer between different utterances.
+  - Experiments with and without duration conditioning.
+- Interactive Streamlit demo
   - Word-level and phoneme-level pitch sliders.
-  - Real-time audio generation.
-  - Sketch vs. generated-pitch visualization (Figures 2 and 3 from the paper).
-  - Sketch-refinement pipeline (Savitzky–Golay smoothing + normalization).
-- **10×2 sketch experiments** — the same sentence with different sketch intensities.
+  - Real-time speech synthesis.
+  - Sketch vs. generated pitch visualization.
+  - Sketch refinement (Savitzky–Golay smoothing + normalization).
+- 10×2 sketch experiments.
 
 ---
 
-## Key Results
+# Key Results
 
-All experiments transfer a pitch or energy **sketch from a source sentence onto a different target sentence**. The single biggest factor in the error is whether the model is given **real phoneme durations** (timing from the target recording) or has to **predict its own**.
+All experiments transfer a pitch or energy **sketch from a source sentence onto a different target sentence**. The largest factor affecting performance is whether the model is given **ground-truth phoneme durations** or must predict them.
 
-### Duration is the dominant factor
+## Duration is the dominant factor
 
-Across runs of different sizes (10, 20, 300 samples), the results cluster tightly by condition:
+| Condition | Pitch RMSE | Energy RMSE |
+|-----------|-----------:|------------:|
+| **With duration** | ~32–34 Hz | ~4.5 dB |
+| **Without duration** | ~48–51 Hz | ~11 dB |
 
-| Condition                        | Pitch RMSE (range) | Energy RMSE (range) |
-|----------------------------------|-------------------:|--------------------:|
-| **With duration** (real timing)  | ~32–34 Hz          | ~4.5 dB             |
-| **Without duration** (predicted) | ~48~51 Hz           | ~11 dB              |
+Providing real durations consistently lowers pitch RMSE by approximately **14–16 Hz**.
 
-→ Providing real durations lowers pitch RMSE by ** ~14 ~ 16 Hz**. The gap is reproduced independently at both 20 and 300 samples, so it is driven by the duration condition itself — not by which utterances happen to land in a given shuffle.
+### Individual Runs
 
-### Individual runs
+#### With duration
 
-**With duration (real timing given):**
+| Run | Samples | Pitch RMSE | Energy RMSE |
+|-----|--------:|-----------:|------------:|
+| vs. target | 10 | 34.11 Hz | 4.52 dB |
+| Cross-utterance | 300 | 32.37 Hz | 4.70 dB |
 
-| Run             | Samples | Pitch RMSE | Energy RMSE |
-|-----------------|--------:|-----------:|------------:|
-| vs. target      | 10      | 34.11 Hz   | 4.52 dB     |
-| Cross-utterance | 300     | 32.37 Hz   | 4.70 dB     |
+#### Without duration
 
-**Without duration (predicted timing):**
+| Run | Samples | Pitch RMSE | Energy RMSE |
+|-----|--------:|-----------:|------------:|
+| Cross-utterance | 300 | 50.10 Hz | 11.04 dB |
 
-| Run             | Samples | Pitch RMSE | Energy RMSE |
-|-----------------|--------:|-----------:|------------:|
-| Cross-utterance | 300     | 50.10 Hz   | 11.04 dB    |
+### Sanity Check
 
-**Sanity check — distance from the pitch *source* (10 samples, with duration):**
-Pitch RMSE 82.47 Hz · Energy RMSE 20.93 dB — deliberately large, since only the pitch *shape* was borrowed, not the words or timing.
+Comparing generated speech against the **source** utterance (instead of the target):
 
-> **Note on variance.** Absolute numbers shift slightly between runs because the original preprocessing randomizes the train/val/test split. We keep this behavior to stay faithful to the original code; the **trends and the ~14 ~16 Hz with/without-duration gap remain consistent**.
+- Pitch RMSE: **82.47 Hz**
+- Energy RMSE: **20.93 dB**
 
-### Energy sketch study
+The error is intentionally large because only the pitch contour is transferred—not the words or timing.
 
-Energy sketch transferred from a source sentence onto a different target, with and without duration conditioning (300 samples each, same DDIM/CFG settings).
+### Energy Transfer
 
-| Run                              | Samples | Pitch RMSE | Energy RMSE |
-|----------------------------------|--------:|-----------:|------------:|
-| Energy transfer, with duration   | 300     | 32.37 Hz   | 4.71 dB     |
-| Energy transfer, without duration| 300     | 48.19 Hz   | 10.93 dB    |
+| Run | Samples | Pitch RMSE | Energy RMSE |
+|-----|--------:|-----------:|------------:|
+| With duration | 300 | 32.37 Hz | 4.71 dB |
+| Without duration | 300 | 48.19 Hz | 10.93 dB |
 
-→ In the energy transfer setting, providing real durations lowers pitch RMSE by ~16 Hz (48.19 → 32.37) and energy RMSE by more than half (10.93 → 4.71 dB), consistent with the with/without-duration gap seen elsewhere.
+Providing real durations reduces pitch RMSE by roughly **16 Hz** and cuts energy RMSE by more than half.
 
-Major Learning : 
-What matters is the TREND is stable:
-- With duration:    always ~32 ~ 34 Hz
-- Without duration: always ~48-51 Hz
-- Gap:              always ~14-16 Hz
+### Main Takeaway
+
+The exact RMSE changes slightly because preprocessing randomly generates the train/validation split (using a fixed seed), but the trend is stable:
+
+| Condition | Pitch RMSE |
+|-----------|-----------:|
+| With duration | ~32–34 Hz |
+| Without duration | ~48–51 Hz |
+| Improvement | ~14–16 Hz |
 
 ---
 
-## Setup
+# Setup
+
+## 1. Clone the repository
 
 ```bash
-# Optional: set proxies if behind a firewall
-export http_proxy=http://proxy.nhr.fau.de:80
-export https_proxy=http://proxy.nhr.fau.de:80
+git clone <your_repository_url>
+cd DrawSpeech_LibriTTS
+```
 
+## 2. Create the environment
+
+```bash
 conda env create -f environment.yml
 conda activate drawspeech
+```
 
-# Install taming-transformers (required for the VAE)
-git clone https://github.com/CompVis/taming-transformers.git
-cd taming-transformers && pip install -e . && cd ..
+If you are working behind a proxy:
 
-export PYTHONPATH=$(pwd):$(pwd)/taming-transformers:$PYTHONPATH
+```bash
+export http_proxy=http://proxy.nhr.fau.de:80
+export https_proxy=http://proxy.nhr.fau.de:80
 ```
 
 ---
 
-## Dataset & Checkpoints
+## 3. Automatic Setup (Recommended)
 
-### LJSpeech
-
-1. Download from [keithito.com](https://keithito.com/LJ-Speech-Dataset/) and place the archive in `data/dataset/`.
-2. Extract the dataset and alignments:
-   ```bash
-   cd data/dataset
-   tar -xjf LJSpeech-1.1.tar.bz2
-   unzip LJSpeech.zip -d LJSpeech-1.1/   # alignments
-   ```
-   Expected structure:
-   ```
-   data/dataset/LJSpeech-1.1/
-   ├── metadata.csv
-   ├── wavs/*.wav
-   └── *.[TextGrid|lab]          # alignment files
-   ```
-
-### Checkpoints
-
-Download the pretrained checkpoints from [HuggingFace](https://huggingface.co/HappyColor/DrawSpeech/tree/main) into `data/checkpoints/`.
-
-If a checkpoint is broken (e.g., `generator_v1` is a 0-byte file), replace it from the mirror:
+Run
 
 ```bash
-rm -f data/checkpoints/LJ_V1/generator_v1
-curl -L -o data/checkpoints/LJ_V1/generator_v1 \
-  "https://drive.usercontent.google.com/download?id=1qpgI41wNXFcH-iKq1Y42JlBC9j0je8PW&export=download"
+chmod +x setup.sh
+./setup.sh
 ```
 
-Then fix the checkpoint key mismatch (produces `data/checkpoints/drawspeech_fixed.ckpt`):
+The setup script automatically
+
+- downloads the DrawSpeech checkpoints from Hugging Face,
+- downloads the HiFi-GAN vocoder,
+- clones and installs `taming-transformers`,
+- downloads the LPIPS VGG model,
+- creates the required directory structure.
+
+Afterwards, fix the checkpoint naming:
 
 ```bash
 python fix_drawspeech.py
 ```
 
+Finally, expose the repository to Python:
+
+```bash
+export PYTHONPATH=$(pwd):$(pwd)/taming-transformers:$PYTHONPATH
+```
+
 ---
 
-## Preprocessing
+# Dataset
 
-Extract mel-spectrograms, pitch, energy, and duration features:
+Download **LJSpeech** from
+
+https://keithito.com/LJ-Speech-Dataset/
+
+Place the archive inside
+
+```
+data/dataset/
+```
+
+Then extract
+
+```bash
+cd data/dataset
+
+tar -xjf LJSpeech-1.1.tar.bz2
+unzip LJSpeech.zip -d LJSpeech-1.1/
+```
+
+Expected directory:
+
+```
+data/dataset/LJSpeech-1.1/
+├── metadata.csv
+├── wavs/
+├── *.lab
+└── *.TextGrid
+```
+
+---
+
+# Preprocessing
+
+Extract mel spectrograms, pitch, duration and energy features.
 
 ```bash
 python preprocessing.py
 ```
 
-> `preprocessing.py` shuffles the train/validation split using a fixed seed, so runs are reproducible. Keep the seed unchanged to match our exact splits.
+---
+
+# Running Experiments
+
+Experiments are executed through SLURM.
+
+```bash
+sbatch run_pitch_cross.sbatch
+```
+
+Pitch transfer without duration
+
+```bash
+sbatch run_pitch_cross_nodur.sbatch
+```
+
+Energy transfer
+
+```bash
+sbatch run_energy_cross.sbatch
+```
+
+10×2 sketch experiment
+
+```bash
+sbatch run_10x2_sketches.sbatch
+```
 
 ---
 
-## Experiments
-
-Experiments are submitted via SLURM. Each script sets its config and runs inference.
-
-```bash
-sbatch run_pitch_cross.sbatch         # pitch cross-utterance (with duration)
-sbatch run_pitch_cross_nodur.sbatch   # pitch cross-utterance (without duration)
-sbatch run_energy_cross.sbatch        # energy cross-utterance (need more work done, future goal)
-sbatch run_10x2_sketches.sbatch       # 10×2 sketch experiments
-```
-
-### Compute RMSE
+# RMSE Evaluation
 
 ```bash
 python compute_rmse.py \
-    --generated_dir "log/latent_diffusion/config/drawspeech_ljspeech_22k/infer_*" \
-    --original_dir  data/dataset/LJSpeech-1.1/wavs
+    --generated_dir log/latent_diffusion/config/drawspeech_ljspeech_22k/infer_* \
+    --original_dir data/dataset/LJSpeech-1.1/wavs
 ```
 
 ---
 
-## Interactive Demo (Streamlit)
+# Streamlit Demo
 
-The app is functional on a GPU node.
+Start the application on the GPU node.
 
-1. **On the GPU node:**
-   ```bash
-   export PYTHONPATH=$(pwd):$(pwd)/taming-transformers:$PYTHONPATH
-   streamlit run app.py --server.port 8501 --server.address 0.0.0.0
-   ```
-2. **From your local machine**, open an SSH tunnel (replace `<GPU_HOST>`, `<LOGIN_NODE>`, `<username>`):
-   ```bash
-   ssh -L 8501:<GPU_HOST>:8501 <username>@<LOGIN_NODE>
-   ```
-   Example: `ssh -L 8501:tg090:8501 user@csnhr.nhr.fau.de`
-3. Open `http://localhost:8501`. If the port is taken, map another (e.g., `-L 8502:tg090:8501` → `http://localhost:8502`).
+```bash
+export PYTHONPATH=$(pwd):$(pwd)/taming-transformers:$PYTHONPATH
 
-**Features:** word- and phoneme-level pitch sliders · real-time audio generation · sketch vs. generated-pitch plots · sketch-refinement pipeline (smoothing + normalization).
+streamlit run app.py \
+    --server.port 8501 \
+    --server.address 0.0.0.0
+```
 
-> **Limitation.** The released checkpoint was trained only on smoothed real pitch contours, so it does not reliably follow arbitrary hand-drawn or slider sketches. Expect subtle rather than dramatic pitch changes.
+Create an SSH tunnel from your local machine.
+
+```bash
+ssh -L 8501:<GPU_HOST>:8501 <username>@<LOGIN_NODE>
+```
+
+Example
+
+```bash
+ssh -L 8501:tg090:8501 user@csnhr.nhr.fau.de
+```
+
+Then open
+
+```
+http://localhost:8501
+```
+
+### Features
+
+- Word-level pitch editing
+- Phoneme-level pitch editing
+- Real-time speech synthesis
+- Pitch visualization
+- Sketch refinement
+- Audio playback
+
+### Current Limitation
+
+The released checkpoint was trained only using smoothed real pitch contours. It therefore follows manually drawn sketches only approximately, rather than exactly.
 
 ---
 
-## Repository Structure
+# Repository Structure
 
 ```
 .
-├── app.py                        # Streamlit interactive demo
-├── sketch_adapter.py             # Sketch refinement pipeline
-├── fix_drawspeech.py             # Checkpoint key mismatch fix
-├── preprocessing.py              # Feature extraction
-├── compute_rmse.py               # RMSE evaluation
-├── compute_rmse_10_utterances.py # 10-utterance RMSE
-├── build_tenx2.py                # 10×2 sketch builder
-├── run_*.sbatch                  # SLURM experiment scripts
-├── environment.yml               # Conda environment
-├── RESULTS.md                    # Experiment results log
+├── app.py
+├── setup.sh
+├── sketch_adapter.py
+├── fix_drawspeech.py
+├── preprocessing.py
+├── compute_rmse.py
+├── compute_rmse_10_utterances.py
+├── build_tenx2.py
+├── run_*.sbatch
+├── environment.yml
+├── RESULTS.md
 ├── drawspeech/
-│   ├── config/drawspeech_ljspeech_22k.yaml
-│   ├── conditional_models.py
-│   ├── dataset_plugin.py
-│   ├── infer.py
-│   └── modules/
-├── tests/                        # Inference JSON configs
+├── tests/
 └── data/
-    ├── checkpoints/              # Pretrained models
-    └── dataset/                  # LJSpeech and alignments
+    ├── checkpoints/
+    └── dataset/
 ```
 
 ---
 
-## Acknowledgements
+# Acknowledgements
 
-- [AudioLDM](https://github.com/haoheliu/AudioLDM-training-finetuning)
-- [FastSpeech 2](https://github.com/ming024/FastSpeech2)
-- [HiFi-GAN](https://github.com/jik876/hifi-gan)
+- AudioLDM
+- FastSpeech2
+- HiFi-GAN
+- DrawSpeech
 
 ---
 
-## Citation
+# Citation
 
 ```bibtex
 @inproceedings{chen2025drawspeech,
@@ -241,6 +310,3 @@ The app is functional on a GPU node.
   doi       = {10.1109/ICASSP49660.2025.10889767}
 }
 ```
-```
-
-That's the complete file. One reminder from earlier: the "Energy sketch study" is still marked _In progress._ — fill that in when you have the numbers, or delete the subsection if you'd rather not show a placeholder.
