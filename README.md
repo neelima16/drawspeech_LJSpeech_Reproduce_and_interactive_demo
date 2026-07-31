@@ -38,9 +38,9 @@ Across runs of different sizes (10, 20, 300 samples), the results cluster tightl
 | Condition                        | Pitch RMSE (range) | Energy RMSE (range) |
 |----------------------------------|-------------------:|--------------------:|
 | **With duration** (real timing)  | ~32–34 Hz          | ~4.5 dB             |
-| **Without duration** (predicted) | ~50 Hz             | ~11 dB              |
+| **Without duration** (predicted) | ~48~51 Hz           | ~11 dB              |
 
-→ Providing real durations lowers pitch RMSE by **~16 Hz**. The gap is reproduced independently at both 20 and 300 samples, so it is driven by the duration condition itself — not by which utterances happen to land in a given shuffle.
+→ Providing real durations lowers pitch RMSE by ** ~14 ~ 16 Hz**. The gap is reproduced independently at both 20 and 300 samples, so it is driven by the duration condition itself — not by which utterances happen to land in a given shuffle.
 
 ### Individual runs
 
@@ -64,9 +64,13 @@ Pitch RMSE 82.47 Hz · Energy RMSE 20.93 dB — deliberately large, since only t
 
 _In progress._
 
-> **Note on variance.** Absolute numbers shift slightly between runs because the original preprocessing randomizes the train/val/test split. We keep this behavior to stay faithful to the original code; the **trends and the ~16 Hz with/without-duration gap remain consistent**.
+> **Note on variance.** Absolute numbers shift slightly between runs because the original preprocessing randomizes the train/val/test split. We keep this behavior to stay faithful to the original code; the **trends and the ~14 ~16 Hz with/without-duration gap remain consistent**.
 
-> **Not comparable:** the paper's headline cross-utterance result (57.67 Hz) keeps the *original* energy and is a different setup — don't compare it directly against the duration pair above.
+Major Learning : 
+What matters is the TREND is stable:
+- With duration:    always ~32 ~ 34 Hz
+- Without duration: always ~48-51 Hz
+- Gap:              always ~14-16 Hz
 
 ---
 
