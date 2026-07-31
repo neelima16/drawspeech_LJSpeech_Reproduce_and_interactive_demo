@@ -62,6 +62,17 @@ Pitch RMSE 82.47 Hz · Energy RMSE 20.93 dB — deliberately large, since only t
 
 > **Note on variance.** Absolute numbers shift slightly between runs because the original preprocessing randomizes the train/val/test split. We keep this behavior to stay faithful to the original code; the **trends and the ~14 ~16 Hz with/without-duration gap remain consistent**.
 
+### Energy sketch study
+
+Energy sketch transferred from a source sentence onto a different target, with and without duration conditioning (300 samples each, same DDIM/CFG settings).
+
+| Run                              | Samples | Pitch RMSE | Energy RMSE |
+|----------------------------------|--------:|-----------:|------------:|
+| Energy transfer, with duration   | 300     | 32.37 Hz   | 4.71 dB     |
+| Energy transfer, without duration| 300     | 48.19 Hz   | 10.93 dB    |
+
+→ In the energy transfer setting, providing real durations lowers pitch RMSE by ~16 Hz (48.19 → 32.37) and energy RMSE by more than half (10.93 → 4.71 dB), consistent with the with/without-duration gap seen elsewhere.
+
 Major Learning : 
 What matters is the TREND is stable:
 - With duration:    always ~32 ~ 34 Hz
